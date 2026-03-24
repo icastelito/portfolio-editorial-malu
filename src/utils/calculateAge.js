@@ -1,0 +1,12 @@
+export function calculateAge(birthDate) {
+	const today = new Date();
+	let age = today.getFullYear() - birthDate.getFullYear();
+	const monthDifference = today.getMonth() - birthDate.getMonth();
+
+	// Se o aniversário ainda não chegou este ano, subtrai 1
+	if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+		age--;
+	}
+
+	return age;
+}
