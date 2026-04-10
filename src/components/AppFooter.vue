@@ -12,7 +12,7 @@
 				<a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
 			</div>
 
-			<p class="footer__copy">&copy; {{ year }} Maria Luiza Pinto Ribeiro. Todos os direitos reservados.</p>
+			<p class="footer__copy">&copy; {{ year }} Icaro Castelo Dev. Todos os direitos reservados.</p>
 		</div>
 	</footer>
 </template>

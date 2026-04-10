@@ -48,49 +48,159 @@
 				<h2>Portfólio</h2>
 				<div class="projects-list">
 					<div v-for="project in projects" :key="project.name" class="project-group">
-						<h3 class="project-name">{{ project.name }}</h3>
+						<div class="project-header">
+							<h3 class="project-name">{{ project.name }}</h3>
+							<div class="view-toggle">
+								<button
+									@click="setViewMode(project.name, 'list')"
+									:class="{ active: getViewMode(project.name) === 'list' }"
+									title="Lista"
+								>
+									<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+										<rect x="0" y="2" width="16" height="2" rx="1" />
+										<rect x="0" y="7" width="16" height="2" rx="1" />
+										<rect x="0" y="12" width="16" height="2" rx="1" />
+									</svg>
+								</button>
+								<button
+									@click="setViewMode(project.name, 'grid')"
+									:class="{ active: getViewMode(project.name) === 'grid' }"
+									title="Quadro"
+								>
+									<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+										<rect x="0" y="0" width="7" height="7" rx="1" />
+										<rect x="9" y="0" width="7" height="7" rx="1" />
+										<rect x="0" y="9" width="7" height="7" rx="1" />
+										<rect x="9" y="9" width="7" height="7" rx="1" />
+									</svg>
+								</button>
+								<button
+									@click="setViewMode(project.name, 'carousel')"
+									:class="{ active: getViewMode(project.name) === 'carousel' }"
+									title="Carrossel"
+								>
+									<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+										<rect x="3" y="2" width="10" height="12" rx="1" />
+										<rect x="0" y="4" width="2" height="8" rx="1" opacity="0.5" />
+										<rect x="14" y="4" width="2" height="8" rx="1" opacity="0.5" />
+									</svg>
+								</button>
+							</div>
+						</div>
 						<p class="project-description">{{ project.description }}</p>
-						<div class="books-list">
-							<a
-								v-for="book in project.books"
-								:key="book.ISBN"
-								:href="book.shopLink"
-								target="_blank"
-								rel="noopener noreferrer"
-								class="book-card"
-							>
-								<img :src="getAmazonImage(book.shopLink)" :alt="book.name" class="book-cover" />
-								<div class="book-info">
-									<p class="book-title">{{ book.name }}</p>
-									<div class="book-divider"></div>
+
+						<!-- Lista -->
+						<template v-if="getViewMode(project.name) === 'list'">
+							<div class="books-list">
+								<a
+									v-for="book in project.books"
+									:key="book.ISBN"
+									:href="book.shopLink"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="book-card"
+								>
+									<img :src="getAmazonImage(book.shopLink)" :alt="book.name" class="book-cover" />
+									<div class="book-info">
+										<p class="book-title">{{ book.name }}</p>
+										<div class="book-divider"></div>
+										<div class="book-tags">
+											<span v-for="op in book.operations" :key="op" class="tag">{{ op }}</span>
+										</div>
+										<dl class="book-details">
+											<div class="book-detail-row">
+												<dt>Ano</dt>
+												<dd>{{ book.year }}</dd>
+											</div>
+											<div class="book-detail-row">
+												<dt>Editora</dt>
+												<dd>{{ book.publisher }}</dd>
+											</div>
+											<div class="book-detail-row">
+												<dt>Publicação</dt>
+												<dd>{{ book.publisment }}</dd>
+											</div>
+											<div class="book-detail-row">
+												<dt>Páginas</dt>
+												<dd>{{ book.pages }}</dd>
+											</div>
+											<div class="book-detail-row">
+												<dt>ISBN</dt>
+												<dd>{{ book.ISBN }}</dd>
+											</div>
+										</dl>
+									</div>
+								</a>
+							</div>
+						</template>
+
+						<!-- Quadro -->
+						<template v-else-if="getViewMode(project.name) === 'grid'">
+							<div class="books-grid">
+								<a
+									v-for="book in project.books"
+									:key="book.ISBN"
+									:href="book.shopLink"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="book-grid-card"
+								>
+									<img
+										:src="getAmazonImage(book.shopLink)"
+										:alt="book.name"
+										class="book-grid-cover"
+									/>
+									<p class="book-grid-title">{{ book.name }}</p>
 									<div class="book-tags">
 										<span v-for="op in book.operations" :key="op" class="tag">{{ op }}</span>
 									</div>
-									<dl class="book-details">
-										<div class="book-detail-row">
-											<dt>Ano</dt>
-											<dd>{{ book.year }}</dd>
-										</div>
-										<div class="book-detail-row">
-											<dt>Editora</dt>
-											<dd>{{ book.publisher }}</dd>
-										</div>
-										<div class="book-detail-row">
-											<dt>Publicação</dt>
-											<dd>{{ book.publisment }}</dd>
-										</div>
-										<div class="book-detail-row">
-											<dt>Páginas</dt>
-											<dd>{{ book.pages }}</dd>
-										</div>
-										<div class="book-detail-row">
-											<dt>ISBN</dt>
-											<dd>{{ book.ISBN }}</dd>
-										</div>
-									</dl>
+								</a>
+							</div>
+						</template>
+
+						<!-- Carrossel -->
+						<template v-else>
+							<div class="books-carousel-wrapper">
+								<button
+									class="carousel-btn"
+									@click="scrollCarousel(project.name, -1)"
+									aria-label="Anterior"
+								>
+									&#8249;
+								</button>
+								<div
+									:ref="
+										(el) => {
+											if (el) carouselRefs[project.name] = el;
+										}
+									"
+									class="books-carousel"
+								>
+									<a
+										v-for="book in project.books"
+										:key="book.ISBN"
+										:href="book.shopLink"
+										target="_blank"
+										rel="noopener noreferrer"
+										class="book-carousel-card"
+									>
+										<img
+											:src="getAmazonImage(book.shopLink)"
+											:alt="book.name"
+											class="book-carousel-cover"
+										/>
+										<p class="book-carousel-title">{{ book.name }}</p>
+									</a>
 								</div>
-							</a>
-						</div>
+								<button
+									class="carousel-btn"
+									@click="scrollCarousel(project.name, 1)"
+									aria-label="Próximo"
+								>
+									&#8250;
+								</button>
+							</div>
+						</template>
 					</div>
 				</div>
 			</section>
@@ -120,6 +230,7 @@
 </template>
 
 <script setup>
+import { reactive } from "vue";
 import { profile } from "../data/profile.js";
 import { contacts } from "../data/contacts.js";
 import { projects } from "../data/projects.js";
@@ -128,6 +239,38 @@ import { getAmazonImage } from "../utils/amazonImage.js";
 
 const year = new Date().getFullYear();
 const profileData = profile[0];
+
+const STORAGE_KEY = "portfolio-view-modes";
+
+function loadViewModes() {
+	try {
+		const saved = localStorage.getItem(STORAGE_KEY);
+		return saved ? JSON.parse(saved) : {};
+	} catch {
+		return {};
+	}
+}
+
+const projectViewModes = reactive(loadViewModes());
+const carouselRefs = {};
+
+function getViewMode(name) {
+	return projectViewModes[name] || "carousel";
+}
+
+function setViewMode(name, mode) {
+	projectViewModes[name] = mode;
+	try {
+		localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...projectViewModes }));
+	} catch {
+		// ignora erros de storage
+	}
+}
+
+function scrollCarousel(name, dir) {
+	const el = carouselRefs[name];
+	if (el) el.scrollBy({ left: dir * 220, behavior: "smooth" });
+}
 </script>
 
 <style scoped>
@@ -291,9 +434,47 @@ h2 {
 	padding-left: 1.5rem;
 }
 
+.project-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 0.5rem;
+}
+
 .project-name {
 	font-size: 1.4rem;
-	margin: 0 0 0.5rem 0;
+	margin: 0;
+}
+
+.view-toggle {
+	display: flex;
+	gap: 0.25rem;
+}
+
+.view-toggle button {
+	background: none;
+	border: 1px solid rgba(109, 147, 148, 0.3);
+	color: inherit;
+	opacity: 0.4;
+	cursor: pointer;
+	padding: 0.3rem;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+}
+
+.view-toggle button:hover {
+	opacity: 0.8;
+	border-color: #6d9394;
+}
+
+.view-toggle button.active {
+	opacity: 1;
+	border-color: #6d9394;
+	background-color: rgba(109, 147, 148, 0.15);
+	color: #6d9394;
 }
 
 .project-description {
@@ -301,6 +482,119 @@ h2 {
 	opacity: 0.7;
 	margin: 0 0 1.25rem 0;
 	line-height: 1.6;
+}
+
+/* Grid */
+.books-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+	gap: 1rem;
+}
+
+.book-grid-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	text-decoration: none;
+	color: inherit;
+	transition: transform 0.2s ease;
+}
+
+.book-grid-card:hover {
+	transform: translateY(-4px);
+}
+
+.book-grid-cover {
+	width: 100%;
+	aspect-ratio: 2 / 3;
+	object-fit: cover;
+	border-radius: 4px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.book-grid-title {
+	font-size: 0.72rem;
+	margin: 0;
+	line-height: 1.3;
+	font-weight: 500;
+}
+
+/* Carrossel */
+.books-carousel-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.books-carousel {
+	display: flex;
+	gap: 1rem;
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	flex: 1;
+	padding-bottom: 0.5rem;
+}
+
+.books-carousel::-webkit-scrollbar {
+	height: 4px;
+}
+
+.books-carousel::-webkit-scrollbar-thumb {
+	background-color: #6d9394;
+	border-radius: 2px;
+}
+
+.book-carousel-card {
+	scroll-snap-align: start;
+	flex-shrink: 0;
+	width: 120px;
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	text-decoration: none;
+	color: inherit;
+}
+
+.book-carousel-cover {
+	width: 120px;
+	height: 160px;
+	object-fit: cover;
+	border-radius: 4px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	transition: transform 0.2s ease;
+}
+
+.book-carousel-card:hover .book-carousel-cover {
+	transform: translateY(-4px);
+}
+
+.book-carousel-title {
+	font-size: 0.72rem;
+	margin: 0;
+	line-height: 1.3;
+	font-weight: 500;
+}
+
+.carousel-btn {
+	background: rgba(109, 147, 148, 0.15);
+	border: 1px solid rgba(109, 147, 148, 0.4);
+	color: #6d9394;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	cursor: pointer;
+	font-size: 1.4rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	line-height: 1;
+	transition: background-color 0.2s ease;
+}
+
+.carousel-btn:hover {
+	background: rgba(109, 147, 148, 0.35);
 }
 
 .books-list {
